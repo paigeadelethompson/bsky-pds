@@ -1,0 +1,26 @@
+version: '3'
+services:
+  pds:
+    image: ghcr.io/bluesky-social/pds:0.4
+    env_file:
+      - ./config.env
+    networks:
+      - traefik_live
+    volumes:
+      - ./pds:/pds:rw
+      - ./blobs:/blobs:rw
+      - ./crdb:/crdb:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pds.rule=Host(`bsky-pds.netcrave.chat`)"
+      - "traefik.http.services.pds.loadbalancer.server.port=3000"
+      - "traefik.http.routers.pds.entrypoints=web"
+      - "traefik.http.routers.pds.service=pds"
+      - "traefik.http.routers.pds-https.rule=Host(`bsky-pds.netcrave.chat`)"
+      - "traefik.http.routers.pds-https.tls=true"
+      - "traefik.http.services.pds-https.loadbalancer.server.port=3000"
+      - "traefik.http.routers.pds-https.entrypoints=websecure"
+      - "traefik.http.routers.pds-https.service=pds"
+networks:
+  traefik_live:
+    external: true
